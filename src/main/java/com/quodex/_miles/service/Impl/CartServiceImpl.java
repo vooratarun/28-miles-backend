@@ -34,6 +34,21 @@ public class CartServiceImpl implements CartService {
     private static final Logger log = LoggerFactory.getLogger(CartServiceImpl.class);
 
 
+    // get cart by userId or cartId
+    // if userId is provided, get cart by userId (logged-in user)
+    // if cartId is provided, get cart by cartId (guest user)
+    // if both are provided, prioritize userId
+    // if neither is provided, throw exception
+    // if cart not found, create new cart
+    // add items to cart
+    // calculate totals
+    // save cart
+    // return cart response
+    // set expected date to createdAt + 10 days
+    // if expected date is already set, do not update it
+    // if cart is new (no id), set expected date
+    // if cart exists and expected date is null, set expected date
+    // return cart response with expected date
     @Override
     public CartResponse addToCart(CartRequest request) {
         User user = null;
@@ -46,8 +61,14 @@ public class CartServiceImpl implements CartService {
 
         if (user != null) {
             // Logged-in user
-            cart = cartRepository.findByUser_UserId(user.getUserId())
-                    .orElse(Cart.builder().user(user).items(new ArrayList<>()).build());
+            cart = cartRepository
+                    .findByUser_UserId(user.getUserId())
+                    .orElse(
+                            Cart.builder()
+                            .user(user)
+                            .items(new ArrayList<>())
+                            .build()
+                    );
         } else if (request.getCartId() != null) {
             // Guest user
             cart = cartRepository.getCartByCartId(request.getCartId())
@@ -122,6 +143,18 @@ public class CartServiceImpl implements CartService {
         return convertToCartResponse(updatedCart);
     }
 
+    // Update entire cart
+    // Clear existing items and add new ones from request
+    // Recalculate totals
+    // Save and return updated cart response
+    // Set expected date to createdAt + 10 days if not already set
+    // if expected date is already set, do not update it
+    // if cart is new (no id), set expected date
+    // if cart exists and expected date is null, set expected date
+    // return cart response with expected date
+    // return cart response with expected date
+    // if expected date is already set, do not update it
+
 
     @Override
     public CartResponse updateCart(String cartId, CartRequest request) {
@@ -176,7 +209,8 @@ public class CartServiceImpl implements CartService {
     public void deleteCartItem(String cartItemId) {
         Cart cart = cartRepository.findAll().stream()
                 .filter(c -> c.getItems().stream()
-                        .anyMatch(i -> i.getCartItemId().equals(cartItemId)))
+                        .anyMatch(i -> i.getCartItemId().equals(cartItemId))
+                )
                 .findFirst()
                 .orElseThrow(() -> new ResourceNotFoundException("Cart not found for cartItemId: " + cartItemId));
 
@@ -271,6 +305,7 @@ public class CartServiceImpl implements CartService {
                 .map(this::convertToCartItemResponse)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+
         cart.setCreatedAt(LocalDateTime.now());
         LocalDateTime expectedDate = cart.getExceptedDate();
         if (expectedDate == null && cart.getCreatedAt() != null) {

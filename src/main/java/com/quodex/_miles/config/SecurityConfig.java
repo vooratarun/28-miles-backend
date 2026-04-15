@@ -23,12 +23,25 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .cors(withDefaults())  // <-- Add this line to enable your CORS configuration
+                .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**","/cart/**").permitAll()
+
+                        // Swagger endpoints are matched without the servlet context path.
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/v3/api-docs.yaml",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/jooq-demo/**"
+                        ).permitAll()
+
+                        // ✅ Existing public APIs
+                        .requestMatchers("/auth/**", "/cart/**", "/mongodb/**", "/kafka/**", "/redis/**", "/s3/**","jooq-demo/**").permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/products/**", "/category/**").permitAll()
+
+                        // ✅ Auth required
                         .requestMatchers("/cart/user/**").authenticated()
 
                         .anyRequest().authenticated()

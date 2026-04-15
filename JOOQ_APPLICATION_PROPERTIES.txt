@@ -1,0 +1,42 @@
+# jOOQ Configuration Guide
+# Add these properties to your application.properties for better jOOQ debugging and performance
+
+# ===== jOOQ Settings =====
+
+# Enable SQL query logging (DEBUG level shows the generated SQL)
+logging.level.org.jooq.tools.LoggerListener=DEBUG
+
+# Enable jOOQ feedback messages
+logging.level.org.jooq=INFO
+
+# ===== Optional: Performance Tuning =====
+
+# Connection pool size (for high-traffic applications)
+# spring.datasource.hikari.maximum-pool-size=20
+# spring.datasource.hikari.minimum-idle=5
+
+# Statement caching (improves performance for repeated queries)
+# spring.datasource.hikari.data-source-properties.preparedStatementCacheSize=250
+# spring.datasource.hikari.data-source-properties.preparedStatementCacheSqlLimit=2048
+
+# ===== Recommended Additional Logging =====
+
+# Uncomment to see Hibernate statistics (useful for N+1 detection)
+# spring.jpa.properties.hibernate.generate_statistics=true
+# logging.level.org.hibernate.stat=DEBUG
+
+# SQL statement logging (shows actual SQL executed)
+# logging.level.org.hibernate.SQL=DEBUG
+# spring.jpa.properties.hibernate.format_sql=true
+# spring.jpa.properties.hibernate.highlight_sql=true
+# spring.jpa.properties.hibernate.use_sql_comments=true
+
+# ===== Usage Notes =====
+
+# 1. jOOQ generates type-safe SQL at compile-time
+# 2. Generated classes are in: src/main/java/com/quodex/_miles/jooq/generated/
+# 3. Regenerate classes when database schema changes: mvn clean compile jooq:generate
+# 4. Use DSLContext for all jOOQ queries
+# 5. Import generated Tables for type-safe column references
+#    Example: import static com.quodex._miles.jooq.generated.Tables.*;
+
